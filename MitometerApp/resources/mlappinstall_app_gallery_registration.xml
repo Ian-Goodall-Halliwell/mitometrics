@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<toolset id="user_apps_toolset" template="false">
+   <tool app_file_path="./" handler_class="com.mathworks.appmanagement.desktop.ToolboxToolSetExtensionHandler" id="cff605f8-30b4-432d-ae4f-39f954a1dd59" label="Mitometer App" toolset_id="user_apps_toolset">
+      <callback>matlab.apputil.run('MitometerAppAPP')</callback>
+      <summary>Automated segmentation and tracking of mitochondria in live-cell time-lapse images.</summary>
+      <description>For more information please visit our article here:
+https://www.nature.com/articles/s41592-021-01234-z
+and our GitHub page here:
+https://github.com/aelefebv/Mitometer</description>
+      <parent_tool id="my_apps" toolset_id="apps_toolset"/>
+   </tool>
+</toolset>
