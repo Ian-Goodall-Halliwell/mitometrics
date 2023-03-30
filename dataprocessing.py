@@ -1,16 +1,19 @@
-import os
-import csv
-import numpy as np
-from sklearn.preprocessing import Normalizer
-import matplotlib.pyplot as plt
-import matplotlib.patches
-import seaborn as sns
-import pandas as pd
-from scipy import stats
-import scipy.stats as st
-import plotly.graph_objects as go
 import ast
+import csv
+from datetime import datetime
+import os
+import matplotlib.patches
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+import scipy.stats as st
+import seaborn as sns
+from scipy import stats
+from sklearn.preprocessing import Normalizer
 
+resultstag = datetime.now().strftime("%Y%m%d-%H%M%S")
+os.mkdir(f"results_{resultstag}")
 data_cuts = [0, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5, 3]
 # data_cuts = [1]
 cutlis = []
@@ -25,7 +28,6 @@ for ct in data_cuts:
         "% peripheral": [],
     }
     for a in os.listdir("out"):
-
         output_data["Sample name"].append(a)
         filoc = "out/{}".format(a)
         for file in os.listdir(filoc):
@@ -52,7 +54,6 @@ for ct in data_cuts:
                 path = os.path.join(filoc, file)
                 with open(path) as f:
                     listofvals = []
-
                     read = csv.reader(f)
                     for lin in read:
                         listofvals.append(lin)
@@ -108,7 +109,6 @@ for ct in data_cuts:
                                                                         split_volume_after_fission
                                                                     )
                                                                 )
-
                                                             print("nan")
                                                         if (
                                                             float(
@@ -164,7 +164,6 @@ for ct in data_cuts:
                                                                         * 100
                                                                     )
                                                                 print("stop")
-
                     print(fission_results)
                     fission_results_fixed = []
                     for val in fission_results:
@@ -177,7 +176,6 @@ for ct in data_cuts:
                     midzone = 0
                     midzonevals = []
                     for valuev in fission_results_fixed:
-
                         if valuev >= 25:
                             midzone += 1
                             midzonevals.append(valuev)
@@ -206,14 +204,50 @@ for ct in data_cuts:
                     varvals["Peripheral"].append(len(perivals))
                     varvals["Stadard Dev"].append(midzonevals + perivals)
     cutlis.append({ct: output_data})
-if os.path.exists("results.csv"):
-    os.remove("results.csv")
-rowmk = ["1"]
-with open("results.csv", "x", newline="") as outfil:
+# if os.path.exists(f"results_{resultstag}/results.csv"):
+#     os.remove(f"results_{resultstag}/results.csv")
+# rowmk = ["1"]
+# with open(f"results_{resultstag}/results.csv", "x", newline="") as outfil:
+#     fields = list(output_data.keys())
+#     wr = csv.writer(outfil)
+#     wr.writerow(fields)
+#     for e, curvl in enumerate(cutlis):
+#         wr.writerow(["Threshold Value:", list(curvl.keys())[0]])
+#         items = np.array(list(curvl[list(curvl.keys())[0]].values()))
+#         liap = []
+#         for row in items.T:
+#             rowr = []
+#             for enr, it in enumerate(row):
+#                 try:
+#                     rowr.append(float(it))
+#                 except Exception as e:
+#                     rowr.append(it)
+#                     pass
+#             if rowmk[0].rsplit(" ", 1)[0] != rowr[0].rsplit(" ", 1)[0]:
+#                 rowmk = rowr
+#             elif rowmk[0].rsplit(" ", 1)[0] == rowr[0].rsplit(" ", 1)[0]:
+#                 rowl = []
+#                 rowl.append(rowmk[0].rsplit(" ", 1)[0])
+#                 rowl.append(rowr[1] + rowmk[1])
+#                 rowl.append((rowr[5] + rowmk[5]) / 2)
+#                 print("k")
+#                 liap.append(rowl)
+#             if rowr[0].rsplit(" ", 1)[0] == "NORM FIS1":
+#                 rowl = []
+#                 rowl.append(rowr[0].rsplit(" ", 1)[0])
+#                 rowl.append(rowr[1])
+#                 rowl.append(rowr[5])
+#                 liap.append(rowl)
+#                 print("k")
+#         for amv in liap:
+#             wr.writerow(amv)
+#         wr.writerow("")
+if os.path.exists(f"results_{resultstag}/resultsfull.csv"):
+    os.remove(f"results_{resultstag}/resultsfull.csv")
+with open(f"results_{resultstag}/resultsfull.csv", "x", newline="") as outfil:
     fields = list(output_data.keys())
     wr = csv.writer(outfil)
     wr.writerow(fields)
-
     for e, curvl in enumerate(cutlis):
         wr.writerow(["Threshold Value:", list(curvl.keys())[0]])
         items = np.array(list(curvl[list(curvl.keys())[0]].values()))
@@ -226,196 +260,122 @@ with open("results.csv", "x", newline="") as outfil:
                 except Exception as e:
                     rowr.append(it)
                     pass
-            if rowmk[0].rsplit(" ", 1)[0] != rowr[0].rsplit(" ", 1)[0]:
-                rowmk = rowr
-            elif rowmk[0].rsplit(" ", 1)[0] == rowr[0].rsplit(" ", 1)[0]:
-                rowl = []
-                rowl.append(rowmk[0].rsplit(" ", 1)[0])
-                rowl.append(rowr[1] + rowmk[1])
-                rowl.append((rowr[5] + rowmk[5]) / 2)
-                print("k")
-                liap.append(rowl)
-            if rowr[0].rsplit(" ", 1)[0] == "NORM FIS1":
-                rowl = []
-                rowl.append(rowr[0].rsplit(" ", 1)[0])
-                rowl.append(rowr[1])
-                rowl.append(rowr[5])
-                liap.append(rowl)
-                print("k")
-        for amv in liap:
-            wr.writerow(amv)
-        wr.writerow("")
-if os.path.exists("resultsfull.csv"):
-    os.remove("resultsfull.csv")
-with open("resultsfull.csv", "x", newline="") as outfil:
-    fields = list(output_data.keys())
-    wr = csv.writer(outfil)
-    wr.writerow(fields)
+            liap.append(rowr)
 
-    for e, curvl in enumerate(cutlis):
-        wr.writerow(["Threshold Value:", list(curvl.keys())[0]])
-        items = np.array(list(curvl[list(curvl.keys())[0]].values()))
-        liap = []
-        for row in items.T:
-            rowr = []
-            for enr, it in enumerate(row):
-                try:
-                    rowr.append(float(it))
-                except Exception as e:
-                    rowr.append(it)
-                    pass
-            if rowmk[0].rsplit(" ", 1)[0] != rowr[0].rsplit(" ", 1)[0]:
-                rowmk = rowr
-            elif rowmk[0].rsplit(" ", 1)[0] == rowr[0].rsplit(" ", 1)[0]:
-                rowl = []
-                rowl.append(rowmk[0].rsplit(" ", 1)[0])
-                rowl.append(rowr[1] + rowmk[1])
-                rowl.append((rowr[5] + rowmk[5]) / 2)
-                print("k")
-                liap.append(rowl)
-            if rowr[0].rsplit(" ", 1)[0] == "NORM FIS1":
-                rowl = []
-                rowl.append(rowr[0].rsplit(" ", 1)[0])
-                rowl.append(rowr[1])
-                rowl.append(rowr[5])
-                liap.append(rowl)
-                print("k")
-        output_data1 = pd.DataFrame(output_data)
+        output_data1 = pd.DataFrame(liap)
         output_data2 = output_data1.to_numpy()
         for amv in output_data2:
             wr.writerow(amv)
         wr.writerow("")
 
-
-dfval = pd.DataFrame(varvals)
-dfarr = dfval.T.to_dict()
-prv = ["0"]
-dfl = []
-rd = {}
-for row in dfarr:
-    row = dfarr[row]
-    try:
-        rd[row["Name"].rsplit(" ", 1)[0]].append(
-            {
-                "Peripheral": row["Peripheral"],
-                "Midzone": row["Midzone"],
-                "Stadard Dev": row["Stadard Dev"],
-            }
-        )
-    except:
-        rd.update({row["Name"].rsplit(" ", 1)[0]: []})
-        rd[row["Name"].rsplit(" ", 1)[0]].append(
-            {
-                "Peripheral": row["Peripheral"],
-                "Midzone": row["Midzone"],
-                "Stadard Dev": row["Stadard Dev"],
-            }
-        )
-crolis = {}
-for row in rd:
-    a = 0
-    b = 0
-    c = []
-    rowd = rd[row]
-
-    for e, l in enumerate(rowd):
-        a += l["Peripheral"]
-        b += l["Midzone"]
-        c += l["Stadard Dev"]
-        print(l)
-    # d = np.mean(c)
-    # c = np.std(c)
-    crolis.update({row: {"Peripheral": a, "Midzone": b, "Sizes": c}})
-
-precleaned_dataframe = pd.DataFrame(crolis).T
-idx = precleaned_dataframe.index.str.rsplit(" ", 1)
-idx = [x[0] for x in idx]
-precleaned_dataframe.index = idx
-indx = precleaned_dataframe.index.str.replace(
-    "Pro|Pro | lif|lif |lif|-| Series|Series| -|- | ", ""
-)
-precleaned_dataframe.index = indx
-
-precleaned_dataframe["Ratio of P/M"] = 100 * (
-    precleaned_dataframe["Peripheral"]
-    / (precleaned_dataframe["Peripheral"] + precleaned_dataframe["Midzone"])
-)
-
-precleaned_dataframe = precleaned_dataframe.drop(["Peripheral", "Midzone"], axis=1)
-CI = st.t.interval(
-    alpha=0.95,
-    df=len(precleaned_dataframe.groupby(precleaned_dataframe.index)["Ratio of P/M"])
-    - 1,
-    loc=precleaned_dataframe.groupby(precleaned_dataframe.index)["Ratio of P/M"].mean(),
-    scale=precleaned_dataframe.groupby(precleaned_dataframe.index)[
-        "Ratio of P/M"
-    ].sem(),
-)
-# oo = precleaned_dataframe.groupby(precleaned_dataframe.index)["Sizes"]
+# Buggy, can be fixed
+# dfval = pd.DataFrame(varvals)
+# dfarr = dfval.T.to_dict()
+# prv = ["0"]
+# dfl = []
+# rd = {}
+# for row in dfarr:
+#     row = dfarr[row]
+#     try:
+#         rd[row["Name"].rsplit(" ", 1)[0]].append(
+#             {
+#                 "Peripheral": row["Peripheral"],
+#                 "Midzone": row["Midzone"],
+#                 "Stadard Dev": row["Stadard Dev"],
+#             }
+#         )
+#     except:
+#         rd.update({row["Name"].rsplit(" ", 1)[0]: []})
+#         rd[row["Name"].rsplit(" ", 1)[0]].append(
+#             {
+#                 "Peripheral": row["Peripheral"],
+#                 "Midzone": row["Midzone"],
+#                 "Stadard Dev": row["Stadard Dev"],
+#             }
+#         )
+# crolis = {}
+# for row in rd:
+#     a = 0
+#     b = 0
+#     c = []
+#     rowd = rd[row]
+#     for e, l in enumerate(rowd):
+#         a += l["Peripheral"]
+#         b += l["Midzone"]
+#         c += l["Stadard Dev"]
+#         print(l)
+#     crolis.update({row: {"Peripheral": a, "Midzone": b, "Sizes": c}})
+# precleaned_dataframe = pd.DataFrame(crolis).T
+# idx = precleaned_dataframe.index.str.rsplit(" ", 1)
+# idx = [x[0] for x in idx]
+# precleaned_dataframe.index = idx
+# indx = precleaned_dataframe.index.str.replace(
+#     "Pro|Pro | lif|lif |lif|-| Series|Series| -|- | ", ""
+# )
+# precleaned_dataframe.index = indx
+# precleaned_dataframe["Ratio of P/M"] = 100 * (
+#     precleaned_dataframe["Peripheral"]
+#     / (precleaned_dataframe["Peripheral"] + precleaned_dataframe["Midzone"])
+# )
+# precleaned_dataframe = precleaned_dataframe.drop(["Peripheral", "Midzone"], axis=1)
+# CI = st.t.interval(
+#     alpha=0.95,
+#     df=len(precleaned_dataframe.groupby(precleaned_dataframe.index)["Ratio of P/M"])
+#     - 1,
+#     loc=precleaned_dataframe.groupby(precleaned_dataframe.index)["Ratio of P/M"].mean(),
+#     scale=precleaned_dataframe.groupby(precleaned_dataframe.index)[
+#         "Ratio of P/M"
+#     ].sem(),
+# )
+# _dataframe = (
+#     precleaned_dataframe.groupby(precleaned_dataframe.index)["Sizes"]
+#     .apply(lambda x: ",".join(x.astype(str)))
+#     .reset_index()
+# )
+# e = [ast.literal_eval(x.strip()) for x in _dataframe.Sizes.values]
+# data = []
+# try:
+#     for cult in e:
+#         data.append([x for y in cult for x in y])
+# except:
+#     for cult in e:
+#         data.append([x for x in cult])
+# _dataframe = pd.DataFrame(data, index=precleaned_dataframe.index.unique()).astype(float)
+# sz = len(_dataframe)
 # Size_CI = st.t.interval(
 #     alpha=0.95,
-#     df=len(precleaned_dataframe.groupby(precleaned_dataframe.index)["Sizes"]) - 1,
-#     loc=precleaned_dataframe.groupby(precleaned_dataframe.index)["Sizes"].mean(),
-#     scale=precleaned_dataframe.groupby(precleaned_dataframe.index)["Sizes"].sem(),
+#     df=_dataframe.notnull().sum(axis=1) - 1,
+#     loc=_dataframe.mean(axis=1),
+#     scale=_dataframe.sem(axis=1),
 # )
-_dataframe = (
-    precleaned_dataframe.groupby(precleaned_dataframe.index)["Sizes"]
-    .apply(lambda x: ",".join(x.astype(str)))
-    .reset_index()
-)
-# _dataframe = _dataframe.Sizes.apply(pd.Series)
-e = [ast.literal_eval(x.strip()) for x in _dataframe.Sizes.values]
-data = []
-for cult in e:
-    data.append([x for y in cult for x in y])
-# e = [y for r in e for y in r]
-_dataframe = pd.DataFrame(data, index=precleaned_dataframe.index.unique()).astype(float)
-# _dataframe.columns = ["sz_{}".format(x + 1) for x in _dataframe.columns]
-# df3 = _dataframe.Sizes.apply(pd.Series)
-# sz_mean = _dataframe.mean()
-# sz_sem = _dataframe.sem()
-sz = len(_dataframe)
-Size_CI = st.t.interval(
-    alpha=0.95,
-    df=_dataframe.notnull().sum(axis=1) - 1,
-    loc=_dataframe.mean(axis=1),
-    scale=_dataframe.sem(axis=1),
-)
-cleaned_dataframe = precleaned_dataframe.groupby(precleaned_dataframe.index).mean()
-
-cleaned_dataframe["Mean Size"] = _dataframe.mean(axis=1)
-cleaned_dataframe["High_PM"] = CI[1] - cleaned_dataframe["Ratio of P/M"]
-cleaned_dataframe["Low_PM"] = cleaned_dataframe["Ratio of P/M"] - CI[0]
-
-cleaned_dataframe["High_Sz"] = Size_CI[1] - _dataframe.mean(axis=1)
-cleaned_dataframe["Low_Sz"] = _dataframe.mean(axis=1) - Size_CI[0]
-
-fig = go.Figure()
-fig.add_trace(
-    go.Bar(
-        name="Percentage of Peripheral Splits",
-        x=cleaned_dataframe.index,
-        y=cleaned_dataframe["Ratio of P/M"],
-        error_y=dict(
-            arrayminus=cleaned_dataframe["Low_PM"], array=cleaned_dataframe["High_PM"]
-        ),
-    )
-)
-
-fig.add_trace(
-    go.Bar(
-        name="Mean Size",
-        x=cleaned_dataframe.index,
-        y=cleaned_dataframe["Mean Size"],
-        error_y=dict(
-            arrayminus=cleaned_dataframe["Low_Sz"], array=cleaned_dataframe["High_Sz"]
-        ),
-    )
-)
-
-fig.update_layout(barmode="group")
-fig.show()
-fig.write_html("Bar_plot_of_Peripheral_to_Midzone.html")
-
-
-print("stop")
+# cleaned_dataframe = precleaned_dataframe.groupby(precleaned_dataframe.index).mean()
+# cleaned_dataframe["Mean Size"] = _dataframe.mean(axis=1)
+# cleaned_dataframe["High_PM"] = CI[1] - cleaned_dataframe["Ratio of P/M"]
+# cleaned_dataframe["Low_PM"] = cleaned_dataframe["Ratio of P/M"] - CI[0]
+# cleaned_dataframe["High_Sz"] = Size_CI[1] - _dataframe.mean(axis=1)
+# cleaned_dataframe["Low_Sz"] = _dataframe.mean(axis=1) - Size_CI[0]
+# fig = go.Figure()
+# fig.add_trace(
+#     go.Bar(
+#         name="Percentage of Peripheral Splits",
+#         x=cleaned_dataframe.index,
+#         y=cleaned_dataframe["Ratio of P/M"],
+#         error_y=dict(
+#             arrayminus=cleaned_dataframe["Low_PM"], array=cleaned_dataframe["High_PM"]
+#         ),
+#     )
+# )
+# fig.add_trace(
+#     go.Bar(
+#         name="Mean Size",
+#         x=cleaned_dataframe.index,
+#         y=cleaned_dataframe["Mean Size"],
+#         error_y=dict(
+#             arrayminus=cleaned_dataframe["Low_Sz"], array=cleaned_dataframe["High_Sz"]
+#         ),
+#     )
+# )
+# fig.update_layout(barmode="group")
+# fig.show()
+# fig.write_html(f"results_{resultstag}/Bar_plot_of_Peripheral_to_Midzone.html")
+# print("stop")
